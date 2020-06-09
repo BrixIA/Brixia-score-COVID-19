@@ -14,6 +14,26 @@ Through inter-rater agreement tests and a gold standard comparison, we were able
 
 This project is approved by the University of Brescia's Ethics Committee 0032690/20 (11/05/2020)
 
+## Brixia-score
+![Brixia-score](figures/brixiascore.png)
+The multi-region 6-valued **Brixia-score** was designed and implemented in routine reporting by the Radiology Unit 2 of ASST Spedali Civili di Brescia, and later validated for risk stratification on a large population.
+According to it, lungs in anteroposterior (AP) or posteroanterior (PA) views, are subdivided into six zones, three for each lung, as shown in Figure above:
+- Upper zones (A and D): above the inferior wall of the aortic arch;
+- Middle zones (B and E): below the inferior wall of the aortic arch and above the inferior wall of the right inferior pulmonary vein (i.e., the hilar structures);
+-  Lower zones (C and F): below the inferior wall of the right inferior pulmonary vein (i.e., the lung bases). 
+
+Whenever it is difficult to identify some anatomical landmarks, due to technical reasons (for example bedside CXR in critical patients), it is acceptable to divide each lung into three equal zones.
+For each zone, a score (ranging from 0 to 3) is assigned, based on the detected lung abnormalities:
+
+- 0: no lung abnormalities;
+- 1: interstitial infiltrates;
+- 2: interstitial (dominant), and alveolar infiltrates;
+- 3: interstitial, and alveolar (dominant) infiltrates.
+
+
+The six scores may be then aggregated to obtain a Global Score in the range *[0,18]*.
+During the peak period, the *Brixia-score* has been systematically used to report CXR in COVID-19 patients.
+
 ## Data
 ### Annotation and CXR from Cohen's dataset
 
@@ -32,12 +52,40 @@ In order to contribute to such public dataset, two expert radiologists, a board-
 | from J-A to J-F | The 6 regions annotatated by a Junior radiologist (+2yr expertise)
 | J-Global | Global score by the Junior radiologist (sum of S-A : S-F)
 
+### Segmentation Dataset
+We provide the script to prepare the dataset as described in the article. The data can be downloaded from their respective sites.
+
+|  | Training-set |  Test-set | Split | 
+|------|-----|-----|-----|
+|[Montgomery County](https://ceb.nlm.nih.gov/repositories/tuberculosis-chest-x-ray-image-data-sets/) | 88           | 50       | first 50 |      
+| [Shenzhen Hospital](https://arxiv.org/abs/1803.01199) | 516          | 50       | first 50 |
+| [JSRT database](http://db.jsrt.or.jp/eng.php)     | 124          | 123      | original |
+|------|-----|-----|-----|
+|Total             | 728           |223      ||
+
+We exploit different segmentation datasets in order to pre-train the ested-Unet module of the proposed architecture. We used the original training/test set splitting when present (as the case of the JSRT database), otherwise we took the first 50 images as test set, and the remaining as training set (see Table above).
+
+*Script TBD*
+
+### Alignment synthetic dataset
+To avoid the inclusion of anatomical parts not belonging to the lungs in the AI pipeline, which would increase the task complexity or introduce unwanted biases, we integrated into the pipeline an alignment block. This exploits a synthetic dataset (used for on-line augmentation) composed of artificially transformed images from the segmentation dataset (see Table below), including random rotations, shifts, and zooms, which is used in the pre-training phase.
+
+The parameters refer to the implementation in Albumentation. In the last column is expressed the probability of the specific transformation being applied.
+
+|    | Parameters (up to) | Probability |
+|----|-----|-----|
+|Rotation | 25 degree  |    0.8  |
+|Scale    | 10%          | 0.8   |
+|Shift     | 10%           | 0.8 |
+|Elastic transformation  | alpha=60, sigma=12  |   0.2   |
+|Grid distortion     | steps=5, limit=0.3 |    0.2  |
+|Optical distortion     | distort=0.2, shift=0.05    |     0.2   |
+
+*Script TBD*
+
+
 ### Brixia-dataset
 *Waiting for Ethical Cometee approval.*
-
-### Segmentation Dataset
-*TBD*
-
 
 ## Disclaimer
 
@@ -48,13 +96,14 @@ Please do not claim diagnostic performance of a model without a clinical study! 
 
 ## License and Attribution
 
-- Code and annotations:
-- Data: 
-- Each image has license specified in the metadata.csv file. Including Apache 2.0, CC BY-NC-SA 4.0, CC BY 4.0.
+-  Data: 
+   - Pulic Cohen dataset: Each image has license specified in the original repository by [Cohen](https://github.com/ieee8023/covid-chestxray-dataset) file. Including Apache 2.0, CC BY-NC-SA 4.0, CC BY 4.0. There are additional 7 images from Brescia under a CC BY-NC-SA 4.0 license.
+   - Pulic Cohen dataset annotations are released under a CC BY-NC-SA 4.0 license.
 
-The metadata.csv, scripts, and other documents are released under a CC BY-NC-SA 4.0 license. Companies are free to perform research. Beyond that contact us.
+
 
 ## Contact Information
+*TBD*
 
 ## Citation
 
