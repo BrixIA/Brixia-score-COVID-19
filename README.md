@@ -3,6 +3,17 @@ End-to-end learning for semiquantitative rating of COVID-19 severity on Chest X-
 
 ![Global flowchart](figures/global-flowchart.png "Global flowchart")
 
+Table of Contents
+=================
+
+  * [Introduction](#Introduction)
+  * [Brixia-score description](#Brixia-score)
+  * [Data](#Data)
+  * [Proposed architecture](#BSNet)
+  * [Results](#Results)
+  * [License](#license-and-attribution)
+  * [Citation](#Citation)
+
 
 ## Introduction
 In this work we designed an end-to-end deep learning architecture for predicting, on Chest X-rays images (CRX), a multi-regional score conveying the degree of lung compromise in COVID-19 patients.
@@ -43,6 +54,8 @@ In order to contribute to such public dataset, two expert radiologists, a board-
 
 
 *Below a list of each field in the [annotation csv](public-annotations.csv), with explanations where relevant*
+<details>
+ <summary>Scheme</summary>
 
 | Attribute | Description |
 |------|-----|
@@ -51,9 +64,14 @@ In order to contribute to such public dataset, two expert radiologists, a board-
 | S-Global | Global score by the Senior radiologist (sum of S-A : S-F)
 | from J-A to J-F | The 6 regions annotatated by a Junior radiologist (+2yr expertise)
 | J-Global | Global score by the Junior radiologist (sum of S-A : S-F)
+</details>
+
 
 ### Segmentation Dataset
 We provide the script to prepare the dataset as described in the article. The data can be downloaded from their respective sites.
+
+<details>
+ <summary>Table</summary>
 
 |  | Training-set |  Test-set | Split | 
 |------|-----|-----|-----|
@@ -62,6 +80,7 @@ We provide the script to prepare the dataset as described in the article. The da
 | [JSRT database](http://db.jsrt.or.jp/eng.php)     | 124          | 123      | original |
 |------|-----|-----|-----|
 |Total             | 728           |223      ||
+</details>
 
 We exploit different segmentation datasets in order to pre-train the ested-Unet module of the proposed architecture. We used the original training/test set splitting when present (as the case of the JSRT database), otherwise we took the first 50 images as test set, and the remaining as training set (see Table above).
 
@@ -72,6 +91,9 @@ To avoid the inclusion of anatomical parts not belonging to the lungs in the AI 
 
 The parameters refer to the implementation in Albumentation. In the last column is expressed the probability of the specific transformation being applied.
 
+<details>
+ <summary>Additional details</summary>
+
 |    | Parameters (up to) | Probability |
 |----|-----|-----|
 |Rotation | 25 degree  |    0.8  |
@@ -80,6 +102,7 @@ The parameters refer to the implementation in Albumentation. In the last column 
 |Elastic transformation  | alpha=60, sigma=12  |   0.2   |
 |Grid distortion     | steps=5, limit=0.3 |    0.2  |
 |Optical distortion     | distort=0.2, shift=0.05    |     0.2   |
+</details>
 
 *Script TBD*
 
@@ -99,19 +122,21 @@ Consistency/confusion matrices based on lung regions score values (top, 0-3), an
 Results of the proposed system on five examples from the test-set. (top) Three good predictions. (bottom) Two cases chosen between the worst prediction regarding the original clinical annotation *H*. For each block, the most left image is the input CXR that the network analyses, followed by the aligned and masked lungs, to analyse the quality of the segmentation and alignment block. While in the second row we show the Predicted *Brixia-score* with the clinical ground truth *H*, and the explainability maps. In those maps the relevance goes from white colour (i.e., no contribution to that prediction) to the class colour (i.e., the region had an important weight for the class decision).
 ![Visual Results](figures/results.png)
 
-## Disclaimer
+## License and Attribution
+
+**Disclaimer**
 
 This software, the data, and the annotations, are provided "as-is" without any guarantee of correct functionality or guarantee of quality. No formal support for this software will be given to users. It is possible to report issues on GitHub though. This repository and any other part of the BrixIA project should not be used for medical purposes. In particular this software should not be used to make, support, gain evidence on and aid medical decisions, interventions or diagnoses. 
 
 Please do not claim diagnostic performance of a model without a clinical study! This is not a kaggle competition dataset. 
 
 
-## License and Attribution
-
--  Data: 
+###  Data
    - Pulic Cohen dataset: Each image has license specified in the original repository by [Cohen](https://github.com/ieee8023/covid-chestxray-dataset) file. Including Apache 2.0, CC BY-NC-SA 4.0, CC BY 4.0. There are additional 7 images from Brescia under a CC BY-NC-SA 4.0 license.
    - Pulic Cohen dataset annotations are released under a CC BY-NC-SA 4.0 license.
-
+  
+### Code
+  - CC BY-NC-SA 4.0 
 
 
 ## Contact Information
