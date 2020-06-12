@@ -28,7 +28,7 @@ This project is approved by the University of Brescia's Ethics Committee 0032690
 
 ## Brixia-score
 ![Brixia-score](figures/brixiascore.png)
-The multi-region 6-valued **Brixia-score** was designed and implemented in routine reporting by the Radiology Unit 2 of ASST Spedali Civili di Brescia, and later validated for risk stratification on a large population.
+The multi-region 6-valued **[Brixia-score](https://link.springer.com/article/10.1007/s11547-020-01200-3)** was designed and implemented in routine reporting by the Radiology Unit 2 of ASST Spedali Civili di Brescia, and later validated for risk stratification on a large population.
 According to it, lungs in anteroposterior (AP) or posteroanterior (PA) views, are subdivided into six zones, three for each lung, as shown in Figure above:
 - Upper zones (A and D): above the inferior wall of the aortic arch;
 - Middle zones (B and E): below the inferior wall of the aortic arch and above the inferior wall of the right inferior pulmonary vein (i.e., the hilar structures);
@@ -54,7 +54,7 @@ We exploit the public repository by [Cohen et al.](https://github.com/ieee8023/c
 In order to contribute to such public dataset, two expert radiologists, a board-certified staff member and a trainee with 22 and 2 years of experience respectively, produced the related Brixia-score annotations for CXR in this collection, exploiting [labelbox](https://labelbox.com), an online solution for labelling. After discarding problematic cases (e.g., images with a significant portion missing, too small resolution, the impossibility of scoring for external reasons, etc.), the final dataset is composed of 192 CXR, completely annotated according to the Brixia-score system.
 
 
-*Below a list of each field in the [annotation csv](public-annotations.csv), with explanations where relevant*
+*Below a list of each field in the [annotation csv](data/public-annotations.csv), with explanations where relevant*
 <details>
  <summary>Scheme</summary>
 
@@ -109,7 +109,7 @@ The parameters refer to the implementation in Albumentation. In the last column 
 
 
 ### Brixia-dataset
-*Waiting for Ethical Cometee approval.*
+*EC permission for dataset release pending.*
 
 
 ## BSNet
@@ -135,6 +135,7 @@ from datasets import brixiascore_cohen  as bsc
 # Check the docsting for additional info
 X_train, X_test, y_train, y_test = bsc.get_data()
 ```
+### Other steps TBD
 
 ## Results
 Consistency/confusion matrices based on lung regions score values (top, 0-3), and on Global Score values (bottom, 0-18).
