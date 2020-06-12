@@ -153,11 +153,11 @@ Please do not claim diagnostic performance of a model without a clinical study! 
 
 
 ###  Data
-   - Pulic Cohen dataset: Each image has license specified in the original repository by [Cohen](https://github.com/ieee8023/covid-chestxray-dataset) file. Including Apache 2.0, CC BY-NC-SA 4.0, CC BY 4.0. There are additional 7 images from Brescia under a CC BY-NC-SA 4.0 license.
-   - Pulic Cohen dataset annotations are released under a CC BY-NC-SA 4.0 license.
+   - Pulic Cohen dataset: Each image has license specified in the original file by [Cohen's repository](https://github.com/ieee8023/covid-chestxray-dataset) file. Including Apache 2.0, CC BY-NC-SA 4.0, CC BY 4.0. There are additional 7 images from Brescia under a CC BY-NC-SA 4.0 license.
+   - Brixia-score annotations for the pulic Cohen's dataset are released under a CC BY-NC-SA 4.0 license.
   
 ### Code
-  - CC BY-NC-SA 4.0 
+  - Will be released under MIT license
 
 
 ## Contact Information
@@ -165,7 +165,7 @@ Please do not claim diagnostic performance of a model without a clinical study! 
 
 ## Citation
 
-Paper avaible [here](https://arxiv.org/abs/2006.04603)
+Preprint avaible [here](https://arxiv.org/abs/2006.04603)
 ```
 @article{sig2020covid,
   title={End-to-end learning for semiquantitative rating of COVID-19 severity on Chest X-rays},
