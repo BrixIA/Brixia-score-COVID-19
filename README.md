@@ -10,6 +10,7 @@ Table of Contents
   * [Brixia-score description](#Brixia-score)
   * [Data](#Data)
   * [Proposed architecture](#BSNet)
+  * [Getting Started](#getting-started)
   * [Results](#Results)
   * [License](#license-and-attribution)
   * [Citation](#Citation)
