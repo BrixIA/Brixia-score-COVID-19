@@ -60,10 +60,10 @@ In order to contribute to such public dataset, two expert radiologists, a board-
 | Attribute | Description |
 |------|-----|
 | filename | filename from Cohen dataset |
-| from S-A to S-F | The 6 regions annotatated by a Senior radiologist (+20yr expertise)
-| S-Global | Global score by the Senior radiologist (sum of S-A : S-F)
-| from J-A to J-F | The 6 regions annotatated by a Junior radiologist (+2yr expertise)
-| J-Global | Global score by the Junior radiologist (sum of S-A : S-F)
+| from S-A to S-F | The 6 regions annotatated by a Senior radiologist (+20yr expertise), from 0 to 3 
+| S-Global | Global score by the Senior radiologist (sum of S-A : S-F),  from 0 to 18
+| from J-A to J-F | The 6 regions annotatated by a Junior radiologist (+2yr expertise),  from 0 to 3 
+| J-Global | Global score by the Junior radiologist (sum of S-A : S-F),  from 0 to 18
 </details>
 
 
@@ -114,6 +114,26 @@ The parameters refer to the implementation in Albumentation. In the last column 
 ## BSNet
 Detailed scheme of the proposed architecture. In particular, in the top-middle the CXR to be analyzed is fed to the network. The produced outputs are: the segmentation mask of the lungs (top-left); the aligned mask (middle-left); the *Brixia-score* (top-right).
 ![Architecture](figures/architecture.png)
+
+
+## Getting Started
+### Install Dependencies
+
+The provided code is written for Python 3.x. To install the needed requirements run:
+```
+pip install -r requirements.txt
+```
+For the sake of performance, we suggest to install `tensorflow-gpu` in place of the standard CPU version.
+
+Include the `src` folder in your python library path or launch python from that folder.
+
+### Load Cohen dataset with BrixiaScore annotations
+```python
+from datasets import brixiascore_cohen  as bsc
+
+# Check the docsting for additional info
+X_train, X_test, y_train, y_test = bsc.get_data()
+```
 
 ## Results
 Consistency/confusion matrices based on lung regions score values (top, 0-3), and on Global Score values (bottom, 0-18).
