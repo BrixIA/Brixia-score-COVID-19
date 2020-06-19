@@ -135,6 +135,35 @@ from datasets import brixiascore_cohen  as bsc
 # Check the docsting for additional info
 X_train, X_test, y_train, y_test = bsc.get_data()
 ```
+### Prepare and load the segmentation dataset
+
+To prepare the segmentation dataset either `Montgomery County`, `Shenzhen Hospital`, and `JSRT` datasets must be
+downloaded from their websites and unpacked in a folder (for instance `data/sources/`). Than execute:
+```bash
+ python3 -m datasets.lung_segmentation  --input_folder data/sources/ --target_size 512
+```
+or just import it (the first time it is executed, it will create the segmentation dataset):
+
+```python
+from datasets import lung_segmentation  as ls
+
+# Check the docsting for additional info. The train-set is provided as a generator, while the validation set is
+# preloaded in memory.
+# `get_data` accepts a configuration dictionary where you can specify every parameter. See `ls.default_config`
+train_gen, (val_imgs, val_masks) = ls.get_data()
+```
+
+### Prepare and load the alignment dataset
+To prepare the alignment dataset, the segmentation one mush be already built (see previous point)
+
+```python
+from datasets import synthetic_alignment  as sa
+
+# Check the docsting for additional info. The train-set and validation-set are provided as generators
+# `get_data` accepts a configuration dictionary where you can specify every parameter. See `ls.default_config`
+train_gen, val_gen = sa.get_data()
+```
+
 ### Other steps TBD
 
 ## Results
