@@ -14,8 +14,8 @@ import io
 import cv2
 import numpy as np
 import os
-from skimage import io, filters, exposure
-from glob import glob
+from pathlib import Path
+from skimage import io, exposure
 from tqdm.auto import tqdm
 import argparse
 from .ImageDataAugmentor.image_data_augmentator import ImageDataAugmentor
@@ -23,8 +23,9 @@ from .utils import preprocess, load_image, add_suffix
 
 warnings.filterwarnings('ignore')
 
-OUTPUT_DIR = os.path.join("..", "data")
-SEGMENTATION_SOURCE_DIR = os.path.join(OUTPUT_DIR, "sources")
+l_path = Path(__file__).parent
+OUTPUT_DIR = (l_path / '../../data/').resolve()
+SEGMENTATION_SOURCE_DIR = OUTPUT_DIR / 'sources'
 
 default_config = {
     'image_save_prefix': 'image',
@@ -59,17 +60,21 @@ default_config = {
 }
 
 
-def train_generator(
-        train_path,
-        config=default_config
-):
+def train_generator(train_path, config=default_config):
+    """
+    Create a generator with the training data. It includes an online-augmentation.
+    :param train_path: segmentation dataset train path
+    :param config: configuration dictionary.
+    :return: keras image generator
+    """
+
     def adjust_data(mask):
         mask[mask > 0.5] = 1
         mask[mask <= 0.5] = 0
         mask = np.expand_dims(mask, axis=-1).astype('float')
         return mask
 
-    AUGM = alb.Compose([
+    augm = alb.Compose([
         alb.HorizontalFlip(),
         alb.OneOf([
             alb.RandomContrast(p=config["augm_p_contrast"]),
@@ -109,11 +114,11 @@ def train_generator(
 
     image_datagen = ImageDataAugmentor(
         rescale=1. / 255,
-        augment=AUGM,
+        augment=augm,
         preprocess_input=image_preprocess,
         augment_seed=config["seed"])
 
-    mask_datagen = ImageDataAugmentor(augment=AUGM,
+    mask_datagen = ImageDataAugmentor(augment=augm,
                                       preprocess_input=adjust_data,
                                       augment_seed=config["seed"],
                                       augment_mode="mask")
@@ -144,41 +149,83 @@ def train_generator(
 def val_generator(test_files, config=default_config):
     """
     generate the validation set
-    :param test_files:
-    :param config:
-    :return:
+    :param test_files: segmentation dataset test path
+    :param config: configuration parameters. Config parameters are (target_size, enable_preprocessing)
+    :return: keras image generator
     """
     X = []
     y = []
     for test_file in test_files:
-        img = load_image(test_file, config["target_size"])[:, :, 0]
+        img = load_image(test_file.as_posix(), config["target_size"])[:, :, 0]
         if config["enable_preprocessing"]:
             img = preprocess(img)
         X.append(img)
         y.append(
-            load_image(add_suffix(test_file, "mask"),
+            load_image(add_suffix(test_file.as_posix(), "mask"),
                        target_size=config["target_size"]))
     return np.array(X).reshape((-1, config["target_size"], config["target_size"], 1)), \
            np.array(y).reshape((-1, config["target_size"], config["target_size"], 1))
 
 
 def get_data(config=default_config):
-    SEGMENTATION_DIR = os.path.join(config["output_folder"], "segmentation")
-    SEGMENTATION_TEST_DIR = os.path.join(SEGMENTATION_DIR, "test")
-    SEGMENTATION_TRAIN_DIR = os.path.join(SEGMENTATION_DIR, "train")
-    SEGMENTATION_IMAGE_DIR = os.path.join(SEGMENTATION_TRAIN_DIR, "image")
-    SEGMENTATION_MASK_DIR = os.path.join(SEGMENTATION_TRAIN_DIR, "mask")
+    """
+    Get segmentation image generators
+    :param config: configuration parameters
+
+    Default config:
+    ===
+    'image_save_prefix': 'image',
+    'mask_save_prefix': 'mask',
+    'output_folder': ../data,
+    'source_dir': ../data/sources,
+
+    'target_size': 512,             #output image and mask size
+    'seed': 23,
+    'batch_size': 8,
+    'enable_preprocessing': False,  #whether to enable preprocessing
+
+    # online augmentation parameters
+    'augm_p_corrections': 0.3,
+    'augm_p_contrast': 1,
+    'augm_p_gamma': 1,
+    'augm_p_brightness': 1,
+
+    'augm_p_blurs': 0.5,
+    'augm_p_blur': 1,
+    'augm_p_motionblur': 0.5,
+    'augm_p_medianblur': 0.5,
+
+    'augm_p_distortions': 0.3,
+    'augm_p_elastic': 0.1,
+    'augm_p_grid': 0.1,
+    'augm_p_optical': 0.1,
+
+    'augm_p_shiftscalrot': 0.5,
+    'augm_shift_limit': 0.2,
+    'augm_scale_limit': 0.1,
+    'augm_rotate_limit': 20,
+    :return: (tuple) training generator; preloaded val data as tuple of np.ndarray (image, mask)
+    """
+    segmentation_test_dir = config["output_folder"] / "segmentation" / "test"
+    segmentation_train_dir = config["output_folder"] / "segmentation" / "train"
+    segmentation_image_dir = segmentation_train_dir / "image"
+    segmentation_mask_dir = segmentation_train_dir / "mask"
 
     preapre_dataset(input_folder=config["source_dir"],
                     output_folder=config["output_folder"],
                     image_size=config["target_size"],
                     force_reset=False)
 
-    si = glob(os.path.join(SEGMENTATION_IMAGE_DIR, '*'))
-    sm = glob(os.path.join(SEGMENTATION_MASK_DIR, '*'))
-    if len(si) == len(sm) and len(si) > 0:
-        tr = train_generator(SEGMENTATION_TRAIN_DIR, config=config)
-        val = val_generator(SEGMENTATION_TEST_DIR, config=config)
+    si = len(list(segmentation_image_dir.glob('*')))
+    sm = len(list(segmentation_mask_dir.glob('*')))
+    if si == sm and si > 0:
+        tr = train_generator(segmentation_train_dir, config=config)
+
+        val_files = [test_file for test_file in segmentation_test_dir.glob("*.png")
+                     if ("_mask" not in test_file.name and "_dilate" not in test_file.name and
+                         "_predict" not in test_file.name)
+                     ]
+        val = val_generator(val_files, config=config)
         return tr, val
     else:
         print("Something goes wrong. I cannot find the dataset.")
@@ -188,19 +235,19 @@ def get_data(config=default_config):
 def prepare_jsrt(j_image_dir, j_train_left_mask_dir, j_train_right_mask_dir,
                  j_test_left_mask_dir, j_test_right_mask_dir, segmentation_image_dir,
                  segmentation_mask_dir, segmentation_test_dir, image_size=512):
-    jsrt_train = glob(os.path.join(j_train_left_mask_dir, '*.gif'))
-    jsrt_test = glob(os.path.join(j_test_left_mask_dir, '*.gif'))
+    jsrt_train = j_train_left_mask_dir.glob('*.gif')
+    jsrt_test = j_test_left_mask_dir.glob('*.gif')
 
     for left_image_file in tqdm(jsrt_train):
-        base_file = os.path.basename(left_image_file)
-        image_file = os.path.join(j_image_dir, base_file[:-3] + 'IMG')
-        right_image_file = os.path.join(j_train_right_mask_dir, base_file)
+        base_file = left_image_file.name
+        image_file = j_image_dir / left_image_file.stem + '.IMG'
+        right_image_file = j_train_right_mask_dir / base_file
 
-        image = 1.0 - np.fromfile(image_file, dtype='>u2').reshape((2048, 2048)) * 1. / 4096
+        image = 1.0 - np.fromfile(image_file.as_posix(), dtype='>u2').reshape((2048, 2048)) * 1. / 4096
         image = exposure.equalize_hist(image)
         image = (255 * image).astype(np.uint8)
-        left_mask = io.imread(left_image_file)
-        right_mask = io.imread(right_image_file)
+        left_mask = io.imread(left_image_file.as_posix())
+        right_mask = io.imread(right_image_file.as_posix())
 
         image = cv2.resize(image, (image_size, image_size))
         left_mask = cv2.resize(left_mask, (image_size, image_size))
@@ -208,21 +255,21 @@ def prepare_jsrt(j_image_dir, j_train_left_mask_dir, j_train_right_mask_dir,
 
         mask = np.maximum(left_mask, right_mask)
 
-        cv2.imwrite(os.path.join(segmentation_image_dir, base_file[:-3] + 'png'), \
+        cv2.imwrite((segmentation_image_dir / base_file.stem + 'png').as_posix(),
                     image)
-        cv2.imwrite(os.path.join(segmentation_mask_dir, base_file[:-3] + 'png'), \
+        cv2.imwrite((segmentation_mask_dir / base_file.stem + 'png').as_posix(),
                     mask)
 
     for left_image_file in tqdm(jsrt_test):
-        base_file = os.path.basename(left_image_file)
-        image_file = os.path.join(j_image_dir, base_file[:-3] + 'IMG')
-        right_image_file = os.path.join(j_test_right_mask_dir, base_file)
+        base_file = left_image_file.name
+        image_file = j_image_dir / left_image_file.stem + '.IMG'
+        right_image_file = j_test_right_mask_dir / base_file
 
-        image = 1.0 - np.fromfile(image_file, dtype='>u2').reshape((2048, 2048)) * 1. / 4096
+        image = 1.0 - np.fromfile(image_file.as_posix(), dtype='>u2').reshape((2048, 2048)) * 1. / 4096
         image = exposure.equalize_hist(image)
         image = (255 * image).astype(np.uint8)
-        left_mask = io.imread(left_image_file)
-        right_mask = io.imread(right_image_file)
+        left_mask = io.imread(left_image_file.as_posix())
+        right_mask = io.imread(right_image_file.as_posix())
 
         image = cv2.resize(image, (image_size, image_size))
         left_mask = cv2.resize(left_mask, (image_size, image_size))
@@ -230,56 +277,50 @@ def prepare_jsrt(j_image_dir, j_train_left_mask_dir, j_train_right_mask_dir,
 
         mask = np.maximum(left_mask, right_mask)
 
-        filename, fileext = os.path.splitext(base_file[:-3] + 'png')
-        cv2.imwrite(os.path.join(segmentation_test_dir, base_file[:-3] + 'png'), \
+        cv2.imwrite((segmentation_test_dir / base_file.stem + 'png').as_posix(),
                     image)
-        cv2.imwrite(os.path.join(segmentation_test_dir, \
-                                 "%s_mask%s" % (filename, fileext)), mask)
+        cv2.imwrite((segmentation_test_dir / f"{base_file.stem}_mask.png").as_posix(),
+                    mask)
 
 
 def prepare_shenzhen(s_image_dir, s_mask_dir, segmentation_image_dir, segmentation_mask_dir,
                      segmentation_test_dir, image_size=512):
-    shenzhen_mask_dir = glob(os.path.join(s_mask_dir, '*.png'))
-    shenzhen_test = shenzhen_mask_dir[0:50]
+    shenzhen_mask_dir = list(s_mask_dir.glob('*.png'))
     shenzhen_train = shenzhen_mask_dir[50:]
 
     for mask_file in tqdm(shenzhen_mask_dir):
-        base_file = os.path.basename(mask_file).replace("_mask", "")
-        image_file = os.path.join(s_image_dir, base_file)
+        base_file = mask_file.name.replace("_mask", "")
+        image_file = s_image_dir / base_file
 
-        image = cv2.imread(image_file)
+        image = cv2.imread(image_file.as_posix())
         mask = cv2.imread(mask_file, cv2.IMREAD_GRAYSCALE)
 
         image = cv2.resize(image, (image_size, image_size))
         mask = cv2.resize(mask, (image_size, image_size))
 
-        if (mask_file in shenzhen_train):
-            cv2.imwrite(os.path.join(segmentation_image_dir, base_file), \
+        if mask_file in shenzhen_train:
+            cv2.imwrite((segmentation_image_dir / base_file).as_posix(),
                         image)
-            cv2.imwrite(os.path.join(segmentation_mask_dir, base_file), \
+            cv2.imwrite((segmentation_mask_dir / base_file).as_posix(),
                         mask)
         else:
-            filename, fileext = os.path.splitext(base_file)
-
-            cv2.imwrite(os.path.join(segmentation_test_dir, base_file), \
+            cv2.imwrite((segmentation_test_dir / base_file).as_posix(),
                         image)
-            cv2.imwrite(os.path.join(segmentation_test_dir, \
-                                     "%s_mask%s" % (filename, fileext)), mask)
+            cv2.imwrite((segmentation_test_dir / f"{base_file.stem}_mask{base_file.suffix}").as_posix(), mask)
 
 
 def prepare_montgomery(m_image_dir, m_left_mask_dir, m_right_mask_dir,
                        segmentation_image_dir, segmentation_mask_dir,
                        segmentation_test_dir, image_size=512):
-    montgomery_left_mask_dir = glob(os.path.join(m_left_mask_dir, '*.png'))
-    montgomery_test = montgomery_left_mask_dir[0:50]
+    montgomery_left_mask_dir = list(m_left_mask_dir.glob('*.png'))
     montgomery_train = montgomery_left_mask_dir[50:]
 
     for left_image_file in tqdm(montgomery_left_mask_dir):
-        base_file = os.path.basename(left_image_file)
-        image_file = os.path.join(m_image_dir, base_file)
-        right_image_file = os.path.join(m_right_mask_dir, base_file)
+        base_file = left_image_file.name
+        image_file = m_image_dir / base_file
+        right_image_file = m_right_mask_dir / base_file
 
-        image = cv2.imread(image_file)
+        image = cv2.imread(image_file.as_posix())
         left_mask = cv2.imread(left_image_file, cv2.IMREAD_GRAYSCALE)
         right_mask = cv2.imread(right_image_file, cv2.IMREAD_GRAYSCALE)
 
@@ -290,97 +331,92 @@ def prepare_montgomery(m_image_dir, m_left_mask_dir, m_right_mask_dir,
         mask = np.maximum(left_mask, right_mask)
 
         if left_image_file in montgomery_train:
-            cv2.imwrite(os.path.join(segmentation_image_dir, base_file), \
+            cv2.imwrite((segmentation_image_dir / base_file).as_posix(),
                         image)
-            cv2.imwrite(os.path.join(segmentation_mask_dir, base_file), \
+            cv2.imwrite((segmentation_mask_dir / base_file).as_posix(),
                         mask)
         else:
-            filename, fileext = os.path.splitext(base_file)
-            cv2.imwrite(os.path.join(segmentation_test_dir, base_file), \
+            cv2.imwrite((segmentation_test_dir / base_file).as_posix(),
                         image)
-            cv2.imwrite(os.path.join(segmentation_test_dir, \
-                                     "%s_mask%s" % (filename, fileext)), mask)
+            cv2.imwrite((segmentation_test_dir / f"{base_file.stem}_mask{base_file.stem}").as_posix(),
+                        mask)
 
 
 def preapre_dataset(input_folder=SEGMENTATION_SOURCE_DIR, output_folder=OUTPUT_DIR, image_size=None,
                     force_reset=False):
-    SEGMENTATION_DIR = os.path.join(output_folder, "segmentation")
-    SEGMENTATION_TEST_DIR = os.path.join(SEGMENTATION_DIR, "test")
-    SEGMENTATION_TRAIN_DIR = os.path.join(SEGMENTATION_DIR, "train")
-    SEGMENTATION_IMAGE_DIR = os.path.join(SEGMENTATION_TRAIN_DIR, "image")
-    SEGMENTATION_MASK_DIR = os.path.join(SEGMENTATION_TRAIN_DIR, "mask")
+    segmentation_test_dir = output_folder / "segmentation" / "test"
+    segmentation_train_dir = output_folder / "segmentation" / "train"
+    segmentation_image_dir = segmentation_train_dir / "image"
+    segmentation_mask_dir = segmentation_train_dir / "mask"
 
     if force_reset:
         print("Cleaning dataset...")
-        os.rmdir(SEGMENTATION_IMAGE_DIR)
-        os.rmdir(SEGMENTATION_MASK_DIR)
-        os.rmdir(SEGMENTATION_TEST_DIR)
+        os.rmdir(segmentation_image_dir)
+        os.rmdir(segmentation_mask_dir)
+        os.rmdir(segmentation_test_dir)
 
     # Create folder structure
-    os.makedirs(SEGMENTATION_IMAGE_DIR, exist_ok=True)
-    os.makedirs(SEGMENTATION_MASK_DIR, exist_ok=True)
-    os.makedirs(SEGMENTATION_TEST_DIR, exist_ok=True)
+    os.makedirs(segmentation_image_dir, exist_ok=True)
+    os.makedirs(segmentation_mask_dir, exist_ok=True)
+    os.makedirs(segmentation_test_dir, exist_ok=True)
 
-    si = glob(os.path.join(SEGMENTATION_IMAGE_DIR, '*'))
-    sm = glob(os.path.join(SEGMENTATION_MASK_DIR, '*'))
-    if len(si) == len(sm) and len(si) > 0:
-        print(f"Segmentation images and mask already extracted ({len(si)} items)")
+    si = len(list(segmentation_image_dir.glob('*')))
+    sm = len(list(segmentation_mask_dir.glob('*')))
+    if si == sm and si > 0:
+        print(f"Segmentation images and mask already extracted ({si} items)")
         return
 
-    MONTGOMERY_TRAIN_DIR = os.path.join(SEGMENTATION_SOURCE_DIR, "MontgomerySet")
-    MONTGOMERY_IMAGE_DIR = os.path.join(MONTGOMERY_TRAIN_DIR, "CXR_png")
-    MONTGOMERY_LEFT_MASK_DIR = os.path.join(
-        MONTGOMERY_TRAIN_DIR, "ManualMask", "leftMask")
-    MONTGOMERY_RIGHT_MASK_DIR = os.path.join(
-        MONTGOMERY_TRAIN_DIR, "ManualMask", "rightMask")
-    if len(glob(os.path.join(MONTGOMERY_IMAGE_DIR, '*'))) > 0:
-        prepare_montgomery(m_image_dir=MONTGOMERY_IMAGE_DIR,
-                           m_left_mask_dir=MONTGOMERY_LEFT_MASK_DIR,
-                           m_right_mask_dir=MONTGOMERY_RIGHT_MASK_DIR,
-                           segmentation_image_dir=SEGMENTATION_IMAGE_DIR,
-                           segmentation_mask_dir=SEGMENTATION_MASK_DIR,
-                           segmentation_test_dir=SEGMENTATION_TEST_DIR,
+    print("Extract Montgomery")
+    montgomery_train_dir = input_folder / "MontgomerySet"
+    montgomery_image_dir = montgomery_train_dir / "CXR_png"
+    montgomery_left_mask_dir = montgomery_train_dir / "ManualMask" / "leftMask"
+    montgomery_right_mask_dir = montgomery_train_dir / "ManualMask" / "rightMask"
+    if len(list(montgomery_image_dir.glob('*'))) > 0:
+        prepare_montgomery(m_image_dir=montgomery_image_dir,
+                           m_left_mask_dir=montgomery_left_mask_dir,
+                           m_right_mask_dir=montgomery_right_mask_dir,
+                           segmentation_image_dir=segmentation_image_dir,
+                           segmentation_mask_dir=segmentation_mask_dir,
+                           segmentation_test_dir=segmentation_test_dir,
                            image_size=image_size)
     else:
         print(
-            f"The Montgomery dataset is not present, or in a different position. {MONTGOMERY_IMAGE_DIR} is empty or not exist.")
+            f"The Montgomery dataset is not present, or in a different position. {montgomery_image_dir} is empty or not exist.")
 
-    SHENZHEN_TRAIN_DIR = os.path.join(SEGMENTATION_SOURCE_DIR, "ChinaSet_AllFiles")
-    SHENZHEN_IMAGE_DIR = os.path.join(SHENZHEN_TRAIN_DIR, "CXR_png")
-    SHENZHEN_MASK_DIR = os.path.join(SHENZHEN_TRAIN_DIR, "mask")
-    if len(glob(os.path.join(SHENZHEN_IMAGE_DIR, '*'))) > 0:
-        prepare_shenzhen(SHENZHEN_IMAGE_DIR,
-                         SHENZHEN_MASK_DIR,
-                         segmentation_image_dir=SEGMENTATION_IMAGE_DIR,
-                         segmentation_mask_dir=SEGMENTATION_MASK_DIR,
-                         segmentation_test_dir=SEGMENTATION_TEST_DIR,
+    print("Extract Shenzhen")
+    shenzhen_train_dir = input_folder / "ChinaSet_AllFiles"
+    shenzhen_image_dir = shenzhen_train_dir / "CXR_png"
+    shenzhen_mask_dir = shenzhen_train_dir / "mask"
+    if len(list(shenzhen_image_dir.glob('*'))) > 0:
+        prepare_shenzhen(shenzhen_image_dir,
+                         shenzhen_mask_dir,
+                         segmentation_image_dir=segmentation_image_dir,
+                         segmentation_mask_dir=segmentation_mask_dir,
+                         segmentation_test_dir=segmentation_test_dir,
                          image_size=image_size)
     else:
         print(
-            f"The Shenzhen dataset is not present, or in a different position. {SHENZHEN_IMAGE_DIR} is empty or not exist.")
+            f"The Shenzhen dataset is not present, or in a different position. {shenzhen_image_dir} is empty or not exist.")
 
-    JSRT_DIR = os.path.join(SEGMENTATION_SOURCE_DIR, "JSRT")
-    JSRT_IMAGE_DIR = os.path.join(JSRT_DIR, "images")
-    JSRT_TRAIN_LEFT_MASK_DIR = os.path.join(
-        JSRT_DIR, "annotations", "fold1", "masks", "left lung")
-    JSRT_TRAIN_RIGHT_MASK_DIR = os.path.join(
-        JSRT_DIR, "annotations", "fold1", "masks", "right lung")
-    JSRT_TEST_LEFT_MASK_DIR = os.path.join(
-        JSRT_DIR, "annotations", "fold2", "masks", "left lung")
-    JSRT_TEST_RIGHT_MASK_DIR = os.path.join(
-        JSRT_DIR, "annotations", "fold2", "masks", "right lung")
-    if len(glob(os.path.join(JSRT_IMAGE_DIR, '*'))) > 0:
-        prepare_jsrt(JSRT_IMAGE_DIR,
-                     JSRT_TRAIN_LEFT_MASK_DIR,
-                     JSRT_TRAIN_RIGHT_MASK_DIR,
-                     JSRT_TEST_LEFT_MASK_DIR,
-                     JSRT_TEST_RIGHT_MASK_DIR,
-                     segmentation_image_dir=SEGMENTATION_IMAGE_DIR,
-                     segmentation_mask_dir=SEGMENTATION_MASK_DIR,
-                     segmentation_test_dir=SEGMENTATION_TEST_DIR,
+    print("Extract JSRT")
+    jsrt_dir = input_folder / "JSRT"
+    jsrt_image_dir = jsrt_dir / "images"
+    jsrt_train_left_mask_dir = jsrt_dir / "annotations" / "fold1" / "masks" / "left lung"
+    jsrt_train_right_mask_dir = jsrt_dir / "annotations" / "fold1" / "masks" / "right lung"
+    jsrt_test_left_mask_dir = jsrt_dir / "annotations" / "fold2" / "masks" / "left lung"
+    jsrt_test_right_mask_dir = jsrt_dir / "annotations" / "fold2" / "masks" / "right lung"
+    if len(list(jsrt_image_dir.glob('*'))) > 0:
+        prepare_jsrt(jsrt_image_dir,
+                     jsrt_train_left_mask_dir,
+                     jsrt_train_right_mask_dir,
+                     jsrt_test_left_mask_dir,
+                     jsrt_test_right_mask_dir,
+                     segmentation_image_dir=segmentation_image_dir,
+                     segmentation_mask_dir=segmentation_mask_dir,
+                     segmentation_test_dir=segmentation_test_dir,
                      image_size=image_size)
     else:
-        print(f"The JSRT dataset is not present, or in a different position. {JSRT_IMAGE_DIR} is empty or not exist.")
+        print(f"The JSRT dataset is not present, or in a different position. {jsrt_image_dir} is empty or not exist.")
 
 
 def get_arguments():

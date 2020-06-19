@@ -1,4 +1,4 @@
-# Brixia-score-COVID-19
+# Brixia-score: a multi-regional score conveying the degree of lung compromise in COVID-19 patients
 End-to-end learning for semiquantitative rating of COVID-19 severity on Chest X-rays. Additional material and updates.
 
 ![Global flowchart](figures/global-flowchart.png "Global flowchart")
@@ -138,7 +138,7 @@ X_train, X_test, y_train, y_test = bsc.get_data()
 ### Prepare and load the segmentation dataset
 
 To prepare the segmentation dataset either `Montgomery County`, `Shenzhen Hospital`, and `JSRT` datasets must be
-downloaded from their websites and unpacked in a folder (as `data/sources/`). Than execute:
+downloaded from their websites and unpacked in a folder (for instance `data/sources/`). Than execute:
 ```bash
  python3 -m datasets.lung_segmentation  --input_folder data/sources/ --target_size 512
 ```
@@ -151,6 +151,17 @@ from datasets import lung_segmentation  as ls
 # preloaded in memory.
 # `get_data` accepts a configuration dictionary where you can specify every parameter. See `ls.default_config`
 train_gen, (val_imgs, val_masks) = ls.get_data()
+```
+
+### Prepare and load the alignment dataset
+To prepare the alignment dataset, the segmentation one mush be already built (see previous point)
+
+```python
+from datasets import synthetic_alignment  as sa
+
+# Check the docsting for additional info. The train-set and validation-set are provided as generators
+# `get_data` accepts a configuration dictionary where you can specify every parameter. See `ls.default_config`
+train_gen, val_gen = sa.get_data()
 ```
 
 ### Other steps TBD

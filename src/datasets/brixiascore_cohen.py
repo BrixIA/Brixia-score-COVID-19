@@ -2,33 +2,34 @@ import pandas as pd
 from tqdm.auto import tqdm
 from sklearn.model_selection import train_test_split
 import numpy as np
-import os
+from pathlib import Path
 from .utils import load_image, equalize
+l_path = Path(__file__).parent
 
 
 def get_data(target_size=512, test_size=0.25, random_state=23,
              preprocessing=True, label='senior', label_type='region'):
     """
-
-    :param target_size:
-    :param test_size:
-    :param random_state:
-    :param preprocessing:
-    :param label:
+    Get train and test data from cohen dataset
+    :param target_size: image dimension
+    :param test_size: train test split (default 0.25)
+    :param random_state: random seed
+    :param preprocessing: whether to apply preprocessing
+    :param label: gt label ['senior', 'junior']
     :param label_type:
-    :return:
+    :return: 3x2 region score or global one ['global', 'region']
     """
     assert label in ['senior', 'junior'], print("label field must be either 'senior' or 'junior'.")
     assert label_type in ['global', 'region'], print("label_type must be either 'global' or 'region'.")
 
     # load annotations from csv
-    ds = pd.read_csv('../data/public-annotations.csv')
+    ds = pd.read_csv((l_path / '../../data/public-annotations.csv').resolve())
 
     X = []
     y = []
     for it in tqdm(ds.itertuples()):
-        im = load_image(os.path.join('../data/public-cohen-subset/',
-                                    it.filename), target_size)
+        im = load_image((l_path / '../../data/public-cohen-subset' / it.filename).resolve().as_posix(),
+                        target_size)
         if label == 'senior' and label_type == 'region':
             bs = np.reshape(it[2:8], (2,3)).T
         if label == 'junior' and label_type == 'region':

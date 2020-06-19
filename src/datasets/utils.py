@@ -166,6 +166,8 @@ def load_image(filename, target_size=512):
     :return: loaded image as (num_rows, num_columns, 1)
     """
     img = cv2.imread(filename, cv2.IMREAD_GRAYSCALE)
+    if img is None:
+        print(f"File error: {filename}")
     img = img / 255
     img = cv2.resize(img, (target_size, target_size))
     img = np.reshape(img, img.shape + (1,))
