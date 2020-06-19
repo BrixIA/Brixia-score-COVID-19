@@ -1,4 +1,4 @@
-# Brixia-score-COVID-19
+# Brixia-score: a multi-regional score conveying the degree of lung compromise in COVID-19 patients
 End-to-end learning for semiquantitative rating of COVID-19 severity on Chest X-rays. Additional material and updates.
 
 ![Global flowchart](figures/global-flowchart.png "Global flowchart")
