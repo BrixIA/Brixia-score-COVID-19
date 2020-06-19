@@ -85,7 +85,6 @@ We provide the script to prepare the dataset as described in the article. The da
 
 We exploit different segmentation datasets in order to pre-train the ested-Unet module of the proposed architecture. We used the original training/test set splitting when present (as the case of the JSRT database), otherwise we took the first 50 images as test set, and the remaining as training set (see Table above).
 
-*Script TBD*
 
 ### Alignment synthetic dataset
 To avoid the inclusion of anatomical parts not belonging to the lungs in the AI pipeline, which would increase the task complexity or introduce unwanted biases, we integrated into the pipeline an alignment block. This exploits a synthetic dataset (used for on-line augmentation) composed of artificially transformed images from the segmentation dataset (see Table below), including random rotations, shifts, and zooms, which is used in the pre-training phase.
@@ -105,7 +104,6 @@ The parameters refer to the implementation in Albumentation. In the last column 
 |Optical distortion     | distort=0.2, shift=0.05    |     0.2   |
 </details>
 
-*Script TBD*
 
 
 ### Brixia-dataset
