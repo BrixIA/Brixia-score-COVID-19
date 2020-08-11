@@ -107,7 +107,9 @@ The parameters refer to the implementation in Albumentation. In the last column 
 
 
 ### Brixia-dataset
-*EC permission for dataset release pending.*
+*EC permission for dataset obtained.*
+
+*[News:]* We will release the complete dataset with the annotations very soon.
 
 
 ## BSNet
