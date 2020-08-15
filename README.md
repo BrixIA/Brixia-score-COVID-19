@@ -107,9 +107,10 @@ The parameters refer to the implementation in Albumentation. In the last column 
 
 
 ### Brixia-dataset
-*EC permission for dataset obtained.*
+The access and use, for research purposes only, of the annotated Brixia-Score CXR dataset have been granted form the Institutional Review Board of ASST Spedali Civili di Brescia.
 
-*[News:]* We will release the complete dataset with the annotations very soon.
+The site from which data can be downloaded is under construction and instructions will follow soon.
+
 
 
 ## BSNet
