@@ -139,10 +139,12 @@ The parameters refer to the implementation in Albumentation. In the last column 
 
 ## BSNet
 Detailed scheme of the proposed architecture. In particular, in the top-middle the CXR to be analyzed is fed to the network. The produced outputs are: the segmentation mask of the lungs (top-left); the aligned mask (middle-left); the *Brixia-score* (top-right).
+
 ![Architecture](figures/architecture.png)
 
 
 ## Getting Started
+
 ### Install Dependencies
 
 The provided code is written for Python 3.x. To install the needed requirements run:
@@ -189,36 +191,44 @@ from datasets import synthetic_alignment  as sa
 train_gen, val_gen = sa.get_data()
 ```
 
-### Other steps TBD
+### Other steps
 
-## Results
+Instructions for preparing and loading the Brixia Covid-19 Dataset and the BS-Net will follow (see specific sections for more info).
+
+## BS-Net Results
+A synthesis of Results obtained with BS-Net on the BrixIA Covid-19 Dataset are repored below. More reesults and info can be found on the project paper.
+
 Consistency/confusion matrices based on lung regions score values (top, 0-3), and on Global Score values (bottom, 0-18).
 ![CMs](figures/CMs.png)
 
-Results of the proposed system on five examples from the test-set. (top) Three good predictions. (bottom) Two cases chosen between the worst prediction regarding the original clinical annotation *H*. For each block, the most left image is the input CXR that the network analyses, followed by the aligned and masked lungs, to analyse the quality of the segmentation and alignment block. While in the second row we show the Predicted *Brixia-score* with the clinical ground truth *H*, and the explainability maps. In those maps the relevance goes from white colour (i.e., no contribution to that prediction) to the class colour (i.e., the region had an important weight for the class decision).
+Results of the proposed BS-Net system on five examples from the test-set. (top) Three good predictions. (bottom) Two cases chosen between the worst prediction regarding the original clinical annotation *H*. For each block, the most left image is the input CXR that the network analyses, followed by the aligned and masked lungs, to analyse the quality of the segmentation and alignment block. While in the second row we show the Predicted *Brixia-score* with the clinical ground truth *H*, and the explainability maps. In those maps the relevance goes from white colour (i.e., no contribution to that prediction) to the class colour (i.e., the region had an important weight for the class decision).
 ![Visual Results](figures/results.png)
 
 ## License and Attribution
 
 **Disclaimer**
 
-This software, the data, and the annotations, are provided "as-is" without any guarantee of correct functionality or guarantee of quality. No formal support for this software will be given to users. It is possible to report issues on GitHub though. This repository and any other part of the BrixIA project should not be used for medical purposes. In particular this software should not be used to make, support, gain evidence on and aid medical decisions, interventions or diagnoses. 
-
-Please do not claim diagnostic performance of a model without a clinical study! This is not a kaggle competition dataset. 
-
+The BS-Net model and source code, the BrixIA COVID-19 Dataset, and the Brixia score annotations, are provided "as-is" without any guarantee of correct functionality or guarantee of quality. No formal support for this software will be given to users. It is possible to report issues on GitHub though. This repository and any other part of the BrixIA COVID-19 Project should not be used for medical purposes. In particular this software should not be used to make, support, gain evidence on and aid medical decisions, interventions or diagnoses. Specific terms of use are indicated for each part of the project.
 
 ###  Data
+
+   - BrixIA COVID-19 dataset: access conditions and term of use are reported on the dataset website (stay tuned).
    - Pulic Cohen dataset: Each image has license specified in the original file by [Cohen's repository](https://github.com/ieee8023/covid-chestxray-dataset) file. Including Apache 2.0, CC BY-NC-SA 4.0, CC BY 4.0. There are additional 7 images from Brescia under a CC BY-NC-SA 4.0 license.
    - Brixia-score annotations for the pulic Cohen's dataset are released under a CC BY-NC-SA 4.0 license.
   
 ### Code
-  - Will be released under MIT license
 
+  - Will be released under Open Souurce license (stay tuned)
 
-## Contact Information
-*TBD*
+## Contacts
 
-## Citation
+Alberto Signoroni alberto.signoroni@unibs.it 
+
+Mattia Savardi m.savardi001@unibs.it
+
+## Citations
+
+For any use or reference to this project please cite the following paper.
 
 Preprint avaible [here](https://arxiv.org/abs/2006.04603)
 ```
