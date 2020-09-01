@@ -1,5 +1,24 @@
-# Brixia-score: a multi-regional score conveying the degree of lung compromise in COVID-19 patients
-End-to-end learning for semiquantitative rating of COVID-19 severity on Chest X-rays. Additional material and updates.
+# BrixIA COVID-19 Project page
+
+## What do you find here
+Info, code (BS-Net), link to data (BrixIA COVID-19 Dataset annotated with Brixia-score), and additional material to the project paper
+
+## Defs
+Brixia score: a multi-regional score for Chest X-ray (CXR) conveying the degree of lung compromise in COVID-19 patients
+
+BS-Net: an end-to-end multi-network learning architecture for semiquantitative rating of COVID-19 severity on Chest X-rays
+
+BrixIA COVID-19 Dataset: 4703 CXRs of COVID-19 patients (anonymized) in DICOM format with manually annotated Brixia score
+
+## Project paper
+Preprint avaible [here](https://arxiv.org/abs/2006.04603)
+```
+@article{sig2020covid,
+  title={End-to-end learning for semiquantitative rating of COVID-19 severity on Chest X-rays},
+  author={Alberto Signoroni and Mattia Savardi and Sergio Benini and Nicola Adami and Riccardo Leonardi and Paolo Gibellini and Filippo Vaccher and Marco Ravanelli and Andrea Borghesi and Roberto Maroldi and Davide Farina}
+```
+
+## Overall Scheme
 
 ![Global flowchart](figures/global-flowchart.png "Global flowchart")
 
@@ -17,22 +36,22 @@ Table of Contents
 
 
 ## Introduction
-In this work we designed an end-to-end deep learning architecture for predicting, on Chest X-rays images (CRX), a multi-regional score conveying the degree of lung compromise in COVID-19 patients.
+In this project page we present an end-to-end deep learning architecture (*BS-Net*) for predicting, starting from Chest X-rays images (CRX), a multi-regional score conveying the degree of lung compromise in COVID-19 patients.
 Such semiquantitative scoring system, namely *Brixia-score*, was applied in serial monitoring of such patients, showing significant prognostic value, in one of the hospitals that experienced one of the highest pandemic peaks in Italy.
 
 We exploited a clinical dataset of almost 5,000 CXR annotated images collected in the same hospital. Our BS-Net demonstrated self-attentive behavior and a high degree of accuracy in all processing stages. 
 
 Through inter-rater agreement tests and a gold standard comparison, we were able to show that our solution outperforms single human annotators in rating accuracy and consistency, thus supporting the possibility of using this tool in contexts of computer-assisted monitoring.
 
-This project is approved by the University of Brescia's Ethics Committee 0032690/20 (11/05/2020)
+This project is approved by the Ethical Committee of Brescia (Italy) NP4121 (last update 08/07/2020)
 
 ## Brixia-score
 ![Brixia-score](figures/brixiascore.png)
 The multi-region 6-valued **[Brixia-score](https://link.springer.com/article/10.1007/s11547-020-01200-3)** was designed and implemented in routine reporting by the Radiology Unit 2 of ASST Spedali Civili di Brescia, and later validated for risk stratification on a large population.
-According to it, lungs in anteroposterior (AP) or posteroanterior (PA) views, are subdivided into six zones, three for each lung, as shown in Figure above:
+According to it, lungs in anteroposterior (AP) or posteroanterior (PA) views, are subdivided into six zones, three for each lung, as shown in the above Figure:
 - Upper zones (A and D): above the inferior wall of the aortic arch;
 - Middle zones (B and E): below the inferior wall of the aortic arch and above the inferior wall of the right inferior pulmonary vein (i.e., the hilar structures);
--  Lower zones (C and F): below the inferior wall of the right inferior pulmonary vein (i.e., the lung bases). 
+- Lower zones (C and F): below the inferior wall of the right inferior pulmonary vein (i.e., the lung bases). 
 
 Whenever it is difficult to identify some anatomical landmarks, due to technical reasons (for example bedside CXR in critical patients), it is acceptable to divide each lung into three equal zones.
 For each zone, a score (ranging from 0 to 3) is assigned, based on the detected lung abnormalities:
@@ -44,9 +63,16 @@ For each zone, a score (ranging from 0 to 3) is assigned, based on the detected 
 
 
 The six scores may be then aggregated to obtain a Global Score in the range *[0,18]*.
-During the peak period, the *Brixia-score* has been systematically used to report CXR in COVID-19 patients.
+During the peak period, the *Brixia-score* has been systematically used at ASST Spedali Civili of Brescia to report CXR in COVID-19 patients.
 
-## Data
+## Datasets
+
+### BrixIA COVID-19 Dataset
+The access and use, for research purposes only, of the annotated BrixIA COVID-19 CXR Dataset have been granted form the Ethical Committee of Brescia (Italy) NP4121 (last update 08/07/2020)
+
+**The site from which data can be downloaded is under construction and instructions will follow soon.**
+
+
 ### Annotation and CXR from Cohen's dataset
 
 We exploit the public repository by [Cohen et al.](https://github.com/ieee8023/covid-chestxray-dataset) which contains CXR images (We downloaded a copy on May 11th, 2020).
@@ -69,7 +95,9 @@ In order to contribute to such public dataset, two expert radiologists, a board-
 
 
 ### Segmentation Dataset
-We provide the script to prepare the dataset as described in the article. The data can be downloaded from their respective sites.
+We provide the script to prepare the dataset as described in the Project paper. 
+
+We exploit different segmentation datasets in order to pre-train the extended-Unet module of the proposed architecture. We used the original training/test set splitting when present (as the case of the JSRT database), otherwise we took the first 50 images as test set, and the remaining as training set (see Table below).
 
 <details>
  <summary>Table</summary>
@@ -83,7 +111,7 @@ We provide the script to prepare the dataset as described in the article. The da
 |Total             | 728           |223      ||
 </details>
 
-We exploit different segmentation datasets in order to pre-train the ested-Unet module of the proposed architecture. We used the original training/test set splitting when present (as the case of the JSRT database), otherwise we took the first 50 images as test set, and the remaining as training set (see Table above).
+The data can be downloaded from their respective sites.
 
 
 ### Alignment synthetic dataset
@@ -103,14 +131,6 @@ The parameters refer to the implementation in Albumentation. In the last column 
 |Grid distortion     | steps=5, limit=0.3 |    0.2  |
 |Optical distortion     | distort=0.2, shift=0.05    |     0.2   |
 </details>
-
-
-
-### Brixia-dataset
-The access and use, for research purposes only, of the annotated Brixia-Score CXR dataset have been granted form the Institutional Review Board of ASST Spedali Civili di Brescia.
-
-The site from which data can be downloaded is under construction and instructions will follow soon.
-
 
 
 ## BSNet
