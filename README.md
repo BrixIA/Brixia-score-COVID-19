@@ -1,9 +1,12 @@
-# BrixIA COVID-19 Project page
+# BrixIA COVID-19 Project
 
 ## What do you find here
-Info, code (BS-Net), link to data (BrixIA COVID-19 Dataset annotated with Brixia-score), and additional material to the project paper
+Info, code (BS-Net), link to data (BrixIA COVID-19 Dataset annotated with Brixia-score), and additional material related to the BrixIA COVID-19 Project
 
 ## Defs
+
+BrixIA COVID-19 Project: the project webpage will follow soon (stay tuned!)
+
 Brixia score: a multi-regional score for Chest X-ray (CXR) conveying the degree of lung compromise in COVID-19 patients
 
 BS-Net: an end-to-end multi-network learning architecture for semiquantitative rating of COVID-19 severity on Chest X-rays
