@@ -15,7 +15,11 @@ Preprint avaible [here](https://arxiv.org/abs/2006.04603)
 ```
 @article{sig2020covid,
   title={End-to-end learning for semiquantitative rating of COVID-19 severity on Chest X-rays},
-  author={Alberto Signoroni and Mattia Savardi and Sergio Benini and Nicola Adami and Riccardo Leonardi and Paolo Gibellini and Filippo Vaccher and Marco Ravanelli and Andrea Borghesi and Roberto Maroldi and Davide Farina}
+  author={Alberto Signoroni and Mattia Savardi and Sergio Benini and Nicola Adami and Riccardo Leonardi and Paolo Gibellini and Filippo Vaccher and Marco Ravanelli and Andrea Borghesi and Roberto Maroldi and Davide Farina},
+  journal={arXiv 2006.04603},
+  url={https://arxiv.org/abs/2006.04603},
+  year={2020}
+}
 ```
 
 ## Overall Scheme
