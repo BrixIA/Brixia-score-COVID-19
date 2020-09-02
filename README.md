@@ -32,10 +32,8 @@ Preprint avaible [here](https://arxiv.org/abs/2006.04603)
 Table of Contents
 =================
 
-  * [Data](#Data)
-  * [Proposed architecture](#BSNet)
+  * [Data](#Datasets)
   * [Getting Started](#getting-started)
-  * [Results](#Results)
   * [License](#license-and-attribution)
   * [Citation](#Citation)
   
@@ -159,14 +157,6 @@ train_gen, val_gen = sa.get_data()
 
 Instructions for preparing and loading the Brixia Covid-19 Dataset and the BS-Net will follow (see specific sections for more info).
 
-## BS-Net Results
-A synthesis of Results obtained with BS-Net on the BrixIA Covid-19 Dataset are repored below. More reesults and info can be found on the project paper.
-
-Consistency/confusion matrices based on lung regions score values (top, 0-3), and on Global Score values (bottom, 0-18).
-![CMs](figures/CMs.png)
-
-Results of the proposed BS-Net system on five examples from the test-set. (top) Three good predictions. (bottom) Two cases chosen between the worst prediction regarding the original clinical annotation *H*. For each block, the most left image is the input CXR that the network analyses, followed by the aligned and masked lungs, to analyse the quality of the segmentation and alignment block. While in the second row we show the Predicted *Brixia-score* with the clinical ground truth *H*, and the explainability maps. In those maps the relevance goes from white colour (i.e., no contribution to that prediction) to the class colour (i.e., the region had an important weight for the class decision).
-![Visual Results](figures/results.png)
 
 ## License and Attribution
 
