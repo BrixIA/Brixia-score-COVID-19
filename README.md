@@ -172,7 +172,7 @@ The BS-Net model and source code, the BrixIA COVID-19 Dataset, and the Brixia sc
   
 ### Code
 
-  - Will be released under Open Souurce license (stay tuned)
+  - Will be released under Open Source license (stay tuned)
 
 ## Contacts
 
