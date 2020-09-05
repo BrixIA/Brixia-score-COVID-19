@@ -1,12 +1,11 @@
 # BrixIA COVID-19 Project
 
 ## What do you find here
-Info, code (BS-Net), link to data (BrixIA COVID-19 Dataset annotated with Brixia-score), and additional material related to the BrixIA COVID-19 Project
+Info, code (BS-Net), link to data (BrixIA COVID-19 Dataset annotated with Brixia-score), and additional material related to the [BrixIA COVID-19 Project](https://brixia.github.io/)
 
 ## Defs
 
-BrixIA COVID-19 Project: the project webpage will follow soon (stay tuned!)
-
+BrixIA COVID-19 Project: [go to the webpage](https://brixia.github.io/)
 Brixia score: a multi-regional score for Chest X-ray (CXR) conveying the degree of lung compromise in COVID-19 patients
 
 BS-Net: an end-to-end multi-network learning architecture for semiquantitative rating of COVID-19 severity on Chest X-rays
@@ -42,7 +41,7 @@ Table of Contents
 ### BrixIA COVID-19 Dataset
 The access and use, for research purposes only, of the annotated BrixIA COVID-19 CXR Dataset have been granted form the Ethical Committee of Brescia (Italy) NP4121 (last update 08/07/2020).
 
-**The site from which data can be downloaded is under construction and instructions will follow soon.**
+[**The data can be downloaded from the website https://brixia.github.io/.**](https://brixia.github.io/#get-the-data)
 
 
 ### Annotation and CXR from Cohen's dataset
@@ -166,7 +165,7 @@ The BS-Net model and source code, the BrixIA COVID-19 Dataset, and the Brixia sc
 
 ###  Data
 
-   - BrixIA COVID-19 dataset: access conditions and term of use are reported on the dataset website (stay tuned).
+   - BrixIA COVID-19 dataset: access conditions and term of use are reported on the [dataset website](https://brixia.github.io/#get-the-data).
    - Pulic Cohen dataset: Each image has license specified in the original file by [Cohen's repository](https://github.com/ieee8023/covid-chestxray-dataset) file. Including Apache 2.0, CC BY-NC-SA 4.0, CC BY 4.0. There are additional 7 images from Brescia under a CC BY-NC-SA 4.0 license.
    - Brixia-score annotations for the pulic Cohen's dataset are released under a CC BY-NC-SA 4.0 license.
   
