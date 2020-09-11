@@ -154,7 +154,7 @@ train_gen, val_gen = sa.get_data()
 
 ### Other steps
 
-Instructions for preparing and loading the Brixia Covid-19 Dataset and the BS-Net will follow (see specific sections for more info).
+Instructions for preparing and loading the Brixia Covid-19 Dataset and the BS-Net will follow (see specific sections for more info). 
 
 
 ## License and Attribution
@@ -171,7 +171,7 @@ The BS-Net model and source code, the BrixIA COVID-19 Dataset, and the Brixia sc
   
 ### Code
 
-  - Will be released under Open Source license (stay tuned)
+  - Released under Open Source license.
 
 ## Contacts
 
