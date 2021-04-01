@@ -44,6 +44,15 @@ The access and use, for research purposes only, of the annotated BrixIA COVID-19
 [**The data can be downloaded from the website https://brixia.github.io/.**](https://brixia.github.io/#get-the-data)
 
 
+To unpack all the zipped archives, on unix-like system do:
+1. Download all the files
+2. From the command line call:  cat *.tar.gz.* | tar -xzv
+3. A folder called dicom_clean will be created with all the unpacked files
+
+Instead, for MS Window:
+2. type *.tar.gz.* | tar xvfz -
+
+
 ### Annotation and CXR from Cohen's dataset
 
 We exploit the public repository by [Cohen et al.](https://github.com/ieee8023/covid-chestxray-dataset) which contains CXR images (We downloaded a copy on May 11th, 2020).
@@ -152,6 +161,10 @@ from datasets import synthetic_alignment  as sa
 train_gen, val_gen = sa.get_data()
 ```
 
+### Model weights
+
+The model weight and a demo notebook can be found [here](https://drive.google.com/drive/folders/18PF0xpYd4q_M8CJn7TiO4QXCny1PRgJZ?usp=sharing)
+
 ### Other steps
 
 Instructions for preparing and loading the Brixia Covid-19 Dataset and the BS-Net will follow (see specific sections for more info). 
@@ -183,13 +196,16 @@ Mattia Savardi m.savardi001@unibs.it
 
 For any use or reference to this project please cite the following paper.
 
-Preprint avaible [here](https://arxiv.org/abs/2006.04603)
+[NEWS]: this work got accepted at Medical Image Analysis. Available [here](https://doi.org/10.1016/j.media.2021.102046)
 ```
-@article{sig2020covid,
-  title={End-to-end learning for semiquantitative rating of COVID-19 severity on Chest X-rays},
-  author={Alberto Signoroni and Mattia Savardi and Sergio Benini and Nicola Adami and Riccardo Leonardi and Paolo Gibellini and Filippo Vaccher and Marco Ravanelli and Andrea Borghesi and Roberto Maroldi and Davide Farina},
-  journal={arXiv 2006.04603},
-  url={https://arxiv.org/abs/2006.04603},
-  year={2020}
+@article{SIGNORONI2021102046,
+title = {BS-Net: learning COVID-19 pneumonia severity on a large Chest X-Ray dataset},
+journal = {Medical Image Analysis},
+pages = {102046},
+year = {2021},
+issn = {1361-8415},
+doi = {https://doi.org/10.1016/j.media.2021.102046},
+url = {https://www.sciencedirect.com/science/article/pii/S136184152100092X},
+author = {Alberto Signoroni and Mattia Savardi and Sergio Benini and Nicola Adami and Riccardo Leonardi and Paolo Gibellini and Filippo Vaccher and Marco Ravanelli and Andrea Borghesi and Roberto Maroldi and Davide Farina},
 }
 ```
