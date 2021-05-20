@@ -7,3 +7,4 @@ scikit-learn==0.22.2.post1
 tensorflow==2.2.1
 tqdm==4.45.0
 albumentations==0.4.3
+Keras-Applications==1.0.8
