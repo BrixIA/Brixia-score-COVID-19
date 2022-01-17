@@ -56,6 +56,7 @@ To unpack all the zipped archives, on unix-like system do:
 Instead, for MS Window:
 2. `type *.tar.gz.* | tar xvfz -`
 
+**[Update]** We revised the dataset and removed the DICOM found to have acquisition problems (low quality). The total now is 4695.
 
 ### Annotation and CXR from Cohen's dataset
 
